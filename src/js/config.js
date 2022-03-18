@@ -60,6 +60,7 @@
 
 // availalbe recognizers: [name, required number of templates per class]
 const RECOGNIZERS = [
+  ['PolyRec', 1],
   ['Rubine', 2],
   ['$1', 1],
   ['Protractor', 1],
@@ -172,6 +173,7 @@ const setupPoint = function (point, recognizer) {
     case '!NFTL': return new FTL_Point(point.x, point.y, point.stroke_id);
     case 'uV': return new uV_Point(point.x, point.y, point.stroke_id);
     case 'uF': return new uF_Point([point.x, point.y], point.stroke_id);
+    case 'PolyRec': return new PolyRec_Point(point.x, point.y);
   }
 }
 
@@ -201,6 +203,8 @@ const setupRecognizer = function (recognizer, N) {
     case 'uV': return new uVRecognizer(N);
     // here, uF is setup for the classification of 2D uni-touch gestures
     case 'uF': return new uFRecognizer(N, 3, 1.5, 1, 2, [[0]]);
+    // The number of sampling points of PolyRec is variable for each gesture
+    case 'PolyRec': return new PolyRecognizer();
   }
 }
 
@@ -226,6 +230,7 @@ const addTemplate = function (recognizers, gestureClass, template) {
       case '!NFTL': result = r.SaveAs(template.get(k), gestureClass, '', +Infinity); break;
       case 'uV': result = r.addTemplate(template.get(k), gestureClass); break;
       case 'uF': result = r.addTemplate(template.get(k), gestureClass); break;
+      case 'PolyRec': result = r.AddGesture(gestureClass, template.get(k)); break;
     }
     results.push(result);
   }
@@ -277,6 +282,7 @@ const recognize = function (recognizers, candidate) {
         break;
       case 'uV': result = r.recognize(candidate.get(k)); break;
       case 'uF': result = r.recognize(candidate.get(k)); break;
+      case 'PolyRec': result = r.Recognize(candidate.get(k)); break;
     }
     results.push(result);
   }
